@@ -3,6 +3,7 @@ import React, { PureComponent } from 'react';
 import { Platform, View, TextInput, findNodeHandle } from 'react-native';
 import type { LayoutEvent } from 'react-native/Libraries/Types/CoreEventTypes';
 import TextInputReset from 'react-native-text-input-reset';
+import { specialEmojis } from '../emoji/codePointMap';
 
 import type {
   Auth,
@@ -247,7 +248,11 @@ class ComposeBox extends PureComponent<Props, State> {
     const { dispatch, narrow } = this.props;
     const { message } = this.state;
 
-    dispatch(addToOutbox(this.getDestinationNarrow(), message));
+    const messageReplace = (acc, emoji) => acc.replace(`:${emoji}:`, `:${specialEmojis[emoji]}:`);
+
+    const extractedMessage = Object.keys(specialEmojis).reduce(messageReplace, message);
+
+    dispatch(addToOutbox(this.getDestinationNarrow(), extractedMessage));
 
     this.setMessageInputValue('');
     dispatch(sendTypingStop(narrow));
